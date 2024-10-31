@@ -1,0 +1,25 @@
+{
+  "name": "insurance-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+  "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/credential-provider-node": "^3.682.0",
+    "@aws-sdk/signature-v4": "^3.374.0",
+    "@aws-sdk/types": "^3.679.0",
+    "aws-sdk": "^2.1691.0",
+    "aws4": "^1.13.2",
+    "axios": "^1.7.7",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "jwt-decode": "^4.0.0"
+  }
+}
