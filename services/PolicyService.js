@@ -1,12 +1,13 @@
 const axios = require("axios");
 
 class PolicyService {
-  constructor(accessToken, sessionToken, policyNumber) {
+  constructor(config, accessToken, sessionToken, policyNumber) {
     this.accessToken = accessToken
     this.sessionToken = sessionToken;
     this.policyNumber = policyNumber;
+    this.policyEndpoint = config.policyEndpoint
 
-    if (!process.env.POLICIES_ENDPOINT) {
+    if (!this.policyEndpoint) {
       console.error("POLICIES_ENDPOINT environment variable is missing.");
       throw new Error("POLICIES_ENDPOINT environment variable is required.");
     }
@@ -24,7 +25,7 @@ class PolicyService {
     const accessToken = this.accessToken;
     const sessionToken = this.sessionToken;
     const policyNumber = this.policyNumber;
-    const endpoint = process.env.POLICIES_ENDPOINT.replace(/\/$/, ''); // Ensure no trailing slash
+    const endpoint = this.policyEndpoint.replace(/\/$/, ''); // Ensure no trailing slash
 
     // Define request details
     const url = new URL(`${endpoint}`);

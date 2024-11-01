@@ -19,16 +19,37 @@ const app = express();
 app.use(bodyParser.json());
 app.use(logger);
 
-// Define configuration for mock-carrier
-const mockCarrierConfig = {
-  authEndpoint: process.env.AUTH_ENDPOINT,
-  handshakeEndpoint: process.env.HANDSHAKE_ENDPOINT,
-};
+// Define configuration for each carrier in a dictionary
+const carrierConfigs = {
+    "mock-carrier": {
+      authEndpoint: process.env.AUTH_ENDPOINT,
+      handshakeEndpoint: process.env.HANDSHAKE_ENDPOINT,
+      policyEndpoint: process.env.POLICIES_ENDPOINT
+    },
+    "other-carrier": {
+      authEndpoint: process.env.OTHER_CARRIER_AUTH_ENDPOINT,
+      handshakeEndpoint: process.env.OTHER_CARRIER_HANDSHAKE_ENDPOINT,
+      policyEndpoint: process.env.OTHER_CARRIER_POLICIES_ENDPOINT
+    }
+    // Add more carriers as needed
+  };
+
+// Helper function to get configuration for a specific carrier
+function getCarrierConfig(carrier) {
+    return carrierConfigs[carrier];
+  }
 
 // Main endpoint for fetching and mapping policies
 app.post("/:carrier/policies", async (req, res) => {
     const { carrier } = req.params;
     console.log(`Received request on /${carrier}/policies`);
+
+    // Get configuration for the specified carrier
+    const carrierConfig = getCarrierConfig(carrier);
+    if (!carrierConfig) {
+      console.log(`Configuration for carrier '${carrier}' not found.`);
+      return res.status(404).json({ error: `Unsupported carrier: ${carrier}` });
+    }
 
   const { username, password } = req.body;
   console.log(`Request body - Username: ${username}, Password: ${password ? "****" : "Not provided"}`);
@@ -41,7 +62,7 @@ app.post("/:carrier/policies", async (req, res) => {
 
   try {
     // Initialize AuthService with configuration
-    const authService = new AuthService(mockCarrierConfig);
+    const authService = new AuthService(carrierConfig);
     console.log("AuthService initialized.");
 
     // Authenticate and perform handshake to get session token
@@ -68,7 +89,7 @@ app.post("/:carrier/policies", async (req, res) => {
     }
 
     // Initialize PolicyService with session token
-    const policyService = new PolicyService(accessToken, sessionToken, policyNumber);
+    const policyService = new PolicyService(carrierConfig, accessToken, sessionToken, policyNumber);
     console.log("PolicyService initialized with session token.");
 
     // Fetch policies using session token
